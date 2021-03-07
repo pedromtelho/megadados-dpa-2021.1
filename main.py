@@ -59,6 +59,14 @@ async def create_subject(disciplina: Disciplina):
 @app.delete("/api/delete_subject", response_model=str)
 async def delete_subject(id_disciplina: int):
     if (id_disciplina in disciplinas["id"]):
+        if(id_disciplina in notas["id_disciplina"]):
+            for i in range(0, len(notas["id_disciplina"])):
+                if id_disciplina == notas["id_disciplina"][i]:
+                    idx = notas["id_disciplina"].index(id_disciplina)
+                    del notas["id"][idx]
+                    del notas["id_disciplina"][idx]
+                    del notas["nota"][idx]
+                    del notas["valor"][idx]
         idx = disciplinas["id"].index(id_disciplina)
         del disciplinas["id"][idx]
         del disciplinas["nome"][idx]
@@ -115,14 +123,34 @@ async def edit_grade(id_nota: int, nota: NotaEdit):
         raise Exception("Nota inexistente")
     return "Nota editada com sucesso"
 
-@app.get("/api/subjects", response_model=List[str])
+@app.get("/api/subjects", response_model=List[dict])
 async def list_subjects(id_aluno: int):
     aluno_disciplinas = []
-    for i in range(0, len(disciplinas["id_aluno"])):
-        if disciplinas["id_aluno"][i] == id_aluno:
-            aluno_disciplinas.append(disciplinas["nome"][i])
-    return aluno_disciplinas
+    if id_aluno in alunos["id"]:
+        for i in range(0, len(disciplinas["id_aluno"])):
+            if disciplinas["id_aluno"][i] == id_aluno:
+                objetos_disciplinas = {"id": "", "nome": "", "professor": "", "campo": ""}
+                objetos_disciplinas["id"] = disciplinas["id"][i]
+                objetos_disciplinas["nome"] = disciplinas["nome"][i]
+                objetos_disciplinas["professor"] = disciplinas["professor"][i]
+                objetos_disciplinas["campo"] = disciplinas["campo"][i]
+                aluno_disciplinas.append(objetos_disciplinas)
+        return aluno_disciplinas
+    else:
+        raise Exception("Aluno inexistente")
 
-
-
+@app.get("/api/grades", response_model=List[dict])
+async def list_grades(id_disciplina: int):
+    notas_disciplinas = []
+    if id_disciplina in disciplinas["id"]:
+        for i in range(0, len(notas["id_disciplina"])):
+            if notas["id_disciplina"][i] == id_disciplina:
+                objetos_nota = {"id": "", "nota": "", "valor": ""}
+                objetos_nota["id"] = notas["id"][i]
+                objetos_nota["nota"] = notas["nota"][i]
+                objetos_nota["valor"] = notas["valor"][i]
+                notas_disciplinas.append(objetos_nota)
+        return notas_disciplinas
+    else:
+        raise Exception("Disciplina inexistente")
     
