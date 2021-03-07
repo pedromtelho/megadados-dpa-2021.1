@@ -4,9 +4,11 @@ from typing import Optional, Dict, List
 
 app = FastAPI()
 
-disciplinas = {"nome": [], "id": [], "id_aluno": [], "campo": [], "professor": []}
+disciplinas = {"nome": [], "id": [],
+               "id_aluno": [], "campo": [], "professor": []}
 alunos = {"id": [], "nome": []}
 notas = {"id": [], "id_disciplina": [], "nota": [], "valor": []}
+
 
 class Disciplina(BaseModel):
     id: int
@@ -15,10 +17,12 @@ class Disciplina(BaseModel):
     id_aluno: int
     professor: Optional[str]
 
+
 class DisciplinaEdit(BaseModel):
     nome: Optional[str]
     campo: Optional[str]
     professor: Optional[str]
+
 
 class Nota(BaseModel):
     id: int
@@ -26,15 +30,18 @@ class Nota(BaseModel):
     nota: str
     valor: float
 
+
 class NotaEdit(BaseModel):
     nota: Optional[str]
     valor: Optional[float]
+
 
 class Aluno(BaseModel):
     id: int
     nome: str
 
-@app.post("/api/create_student",response_model=Aluno)
+
+@app.post("/api/create_student", response_model=Aluno)
 async def create_student(aluno: Aluno):
     if aluno.id not in alunos["id"]:
         alunos["id"].append(aluno.id)
@@ -42,6 +49,7 @@ async def create_student(aluno: Aluno):
     else:
         raise Exception("Id de aluno já existe")
     return {"id": aluno.id, "nome": aluno.nome}
+
 
 @app.post("/api/create_subject", response_model=Disciplina)
 async def create_subject(disciplina: Disciplina):
@@ -55,6 +63,7 @@ async def create_subject(disciplina: Disciplina):
         raise Exception("Aluno não existe ou disciplina já existente")
 
     return {"nome": disciplina.nome, "id": disciplina.id, "id_aluno": disciplina.id_aluno, "campo": disciplina.campo, "professor": disciplina.professor}
+
 
 @app.delete("/api/delete_subject", response_model=str)
 async def delete_subject(id_disciplina: int):
@@ -70,6 +79,7 @@ async def delete_subject(id_disciplina: int):
 
     return "Disciplina deletada com sucesso"
 
+
 @app.patch("/api/edit_subject", response_model=str)
 async def edit_subject(id_disciplina: int, disciplina: DisciplinaEdit):
     if id_disciplina in disciplinas["id"] and (disciplina.nome not in disciplinas["nome"]):
@@ -80,6 +90,7 @@ async def edit_subject(id_disciplina: int, disciplina: DisciplinaEdit):
     else:
         raise Exception("Id disciplina inexistente ou novo nome já existe")
     return "Disciplina editada com sucesso"
+
 
 @app.post("/api/create_grade", response_model=Nota)
 async def create_grade(nota: Nota):
@@ -93,6 +104,7 @@ async def create_grade(nota: Nota):
 
     return {"id": nota.id, "nota": nota.nota, "valor": nota.valor, "id_disciplina": nota.id_disciplina}
 
+
 @app.delete("/api/delete_grade", response_model=str)
 async def delete_grade(id_nota: int):
     if (id_nota in notas["id"]):
@@ -105,6 +117,7 @@ async def delete_grade(id_nota: int):
         raise Exception("Nota inexistente")
     return "Nota deletada com sucesso"
 
+
 @app.patch("/api/edit_grade", response_model=str)
 async def edit_grade(id_nota: int, nota: NotaEdit):
     if id_nota in notas["id"]:
@@ -115,6 +128,7 @@ async def edit_grade(id_nota: int, nota: NotaEdit):
         raise Exception("Nota inexistente")
     return "Nota editada com sucesso"
 
+
 @app.get("/api/subjects", response_model=List[str])
 async def list_subjects(id_aluno: int):
     aluno_disciplinas = []
@@ -124,5 +138,10 @@ async def list_subjects(id_aluno: int):
     return aluno_disciplinas
 
 
-
-    
+@app.get("/api/grades", response_model=List[float])
+async def list_subjects(id_materia: int):
+    notas_disciplina = []
+    for i in range(0, len(notas["id_disciplina"])):
+        if notas["id_disciplina"][i] == id_materia:
+            notas_disciplina.append(notas["valor"][i])
+    return notas_disciplina
