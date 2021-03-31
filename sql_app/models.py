@@ -8,16 +8,16 @@ class Student(Base):
     __tablename__ = "students"
 
     id = Column(Integer, primary_key=True, index=True)
-    nome = Column(String, unique=True, index=True)
+    nome = Column(String(128), unique=True, index=True)
 
 
 class Subject(Base):
     __tablename__ = "subjects"
 
     id = Column(Integer, primary_key=True, index=True)
-    nome = Column(String, unique=True, index=True)
-    campo = Column(String)
-    professor = Column(String)
+    nome = Column(String(128), unique=True, index=True)
+    campo = Column(String(128))
+    professor = Column(String(128))
     id_aluno = Column(Integer, ForeignKey("students.id"))
 
 
@@ -26,5 +26,5 @@ class Grades(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     id_disciplina = Column(Integer, ForeignKey("subjects.id"))
-    nota = Column(String)
+    nota = Column(String(128))
     valor = Column(Float)
