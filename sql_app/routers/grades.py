@@ -64,3 +64,24 @@ def get_subjects_grades(student_name: str, subject_name: str, db: Session = Depe
     else:
         raise HTTPException(
             status_code=400, detail="Este aluno não está cadastrado")
+
+@gradesRouter.patch("/grades", response_model=str)
+def update_grade(grade: schemas.GradeCreate, subject_name: str, student_name: str, grade_id: int, db: Session = Depends(get_db)):
+    db_student = crud.get_user_by_name(db, nome=student_name)
+    if db_student:
+        db_subject = crud.get_subject_by_name_per_student(
+            db, nome=subject_name, student_id=db_student.id)
+        if db_subject:
+            db_grade = crud.get_grade_by_id(db=db, id=grade_id)
+            if db_grade:
+                return crud.update_grade(db=db, new_grade=grade, id=grade_id)
+            else:
+                raise HTTPException(
+                    status_code=400, detail="Esta nota não existe no banco de dados")
+        else:
+            raise HTTPException(
+                status_code=400, detail="Esta matéria não existe no banco de dados")
+    else:
+        raise HTTPException(
+            status_code=400, detail="Este aluno não está cadastrado")
+

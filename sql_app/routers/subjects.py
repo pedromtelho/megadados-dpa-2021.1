@@ -56,11 +56,12 @@ def get_students_subjects(student_name: str, db: Session = Depends(get_db)):
             status_code=400, detail="Este aluno não está cadastrado")
 
 
-@subjectsRouter.patch("/subject", response_model=schemas.Subject)
+@subjectsRouter.patch("/subject", response_model=str)
 def update_subject(subject: schemas.SubjectCreate, subject_name: str, student_name: str, db: Session = Depends(get_db)):
-    db_student = crud.get_user_by_name(db, nome=student_name)
+    std = crud.get_user_by_name(db, nome=student_name)
+    db_student = crud.get_subject_by_name_per_student(db, nome=subject_name, student_id=std.id)
     if db_student:
         return crud.update_subject(db=db, subject_name=subject_name, subject=subject, student_id=db_student.id)
     else:
         raise HTTPException(
-            status_code=400, detail="Este aluno não está cadastrado")
+            status_code=400, detail="Aluno ou matéria não estão cadastrados")
