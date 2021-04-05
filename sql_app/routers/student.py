@@ -20,3 +20,8 @@ def create_student(student: schemas.StudentCreate, db: Session = Depends(get_db)
     if db_student:
         raise HTTPException(status_code=400, detail="Este aluno já existe")
     return crud.create_student(db=db, student=student)
+
+
+@studentsRouter.get("/students", response_model=[])
+def get_students(db: Session = Depends(get_db)):
+    return crud.get_students(db=db)
