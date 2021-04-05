@@ -30,8 +30,10 @@ def get_all_subjects_by_user(db: Session, skip: int = 0, student_id=int):
 def get_grade(db: Session, grade_name: str):
     return db.query(models.Grades).filter(models.Grades.nota == grade_name).first()
 
-def get_grade_by_id(db: Session, id: int):
-    return db.query(models.Grades).filter(models.Grades.id == id).first()
+
+def get_grade_by_name(db: Session, name: str):
+    return db.query(models.Grades).filter(models.Grades.nota == name).first()
+
 
 def get_all_grades(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.Grades).offset(skip).limit(limit).all()
@@ -95,8 +97,8 @@ def delete_grade(db: Session,  grade: schemas.Grade):
 # ---- SUBJECT -----
 def update_subject(db: Session, subject_name: str, subject: schemas.SubjectCreate, student_id: int):
     db.query(models.Subject).filter(
-        models.Subject.nome == subject_name).update({models.Subject.nome: subject_name, models.Subject.professor: subject.professor, 
-        models.Subject.campo: subject.campo})
+        models.Subject.nome == subject_name).update({models.Subject.nome: subject.nome, models.Subject.professor: subject.professor,
+                                                     models.Subject.campo: subject.campo})
     # new_subject = models.Subject(
     #     **subject.dict(), id_aluno=student_id, id=old_subject.id)
     db.commit()
@@ -110,7 +112,9 @@ def create_grade(db: Session, grade: schemas.GradeCreate, subject_id: int):
     db.commit()
     return db_grade
 
-def update_grade(db: Session, id: int, new_grade: schemas.GradeCreate):
-    db.query(models.Grades).filter(models.Grades.id == id).update({models.Grades.nota: new_grade.nota, models.Grades.valor: new_grade.valor})
+
+def update_grade(db: Session, name: str, new_grade: schemas.GradeCreate):
+    db.query(models.Grades).filter(models.Grades.nota == name).update(
+        {models.Grades.nota: new_grade.nota, models.Grades.valor: new_grade.valor})
     db.commit()
     return "Updated successfully!"
