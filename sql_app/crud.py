@@ -40,8 +40,9 @@ def get_all_grades_by_subject(db: Session, skip: int = 0, subject_id=int):
 
 # CREATE
 
-
 # ---- USER -----
+
+
 def create_student(db: Session, student: schemas.StudentCreate):
     db_student = models.Student(nome=student.nome)
     db.add(db_student)
@@ -83,3 +84,24 @@ def delete_grade(db: Session,  grade: schemas.Grade):
     db.delete(grade)
     db.commit()
     return "Nota excluída com sucesso"
+
+
+# UPDATE
+
+
+# ---- SUBJECT -----
+def update_subject(db: Session, subject_name: str, subject: schemas.SubjectCreate, student_id: int):
+    old_subject = db.query(models.Subject).filter(
+        models.Subject.nome == subject_name).first()
+    new_subject = models.Subject(
+        **subject.dict(), id_aluno=student_id, id=old_subject.id)
+    db.commit()
+    return new_subject
+
+
+# ---- GRADE -----
+def create_grade(db: Session, grade: schemas.GradeCreate, subject_id: int):
+    db_grade = models.Grades(**grade.dict(), id_disciplina=subject_id)
+    db.add(db_grade)
+    db.commit()
+    return db_grade
